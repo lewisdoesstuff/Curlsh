@@ -10,9 +10,6 @@ namespace Curlsh
 {
     public class Parsing
     {
-
-        
-
         public static string[] Match(string script, string pattern, string removePattern = null)
         {
             Console.WriteLine();

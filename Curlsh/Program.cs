@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using CommandLine;
 using System.Net;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,22 +12,32 @@ namespace Curlsh
 {
     class Options
     {
-
+        [Option('a', "args", Required = false, HelpText = "Passes given arguments to script")]
+        public string Curl { get; set; }
+        [Option('d', "dontrun", Required = false, HelpText = "Just run script analysis, don't run. You'll still be prompted if this isn't passed.")]
+        public bool DontRun { get; set; }
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            var get = args[0];
-            var script = Fetch(get);
-            
-            Console.WriteLine(script);
-            Urls(script);
-            Repos(script);
-            Make(script);
-            Remove(script);
+            Parser.Default.ParseArguments<Options>(args)
+                .WithParsed<Options>(o =>
+                {
+                    var get = args[0];
+                    var script = Fetch(get);
 
+                    Console.WriteLine(script);
+                    Urls(script);
+                    Repos(script);
+                    Make(script);
+                    Remove(script);
+                    if (o.DontRun) return;
+                    Console.WriteLine("\n");
+                    Console.WriteLine("Exit Code: " + Run(script, o.Curl));
+
+                });
 
         }
 
@@ -114,7 +127,30 @@ namespace Curlsh
             
             return script;
         }
-        
+
+        static int Run(string script, string curlArgs = null)
+        {
+
+            if (!string.IsNullOrEmpty(curlArgs))
+            {
+                var curlSep = curlArgs.Split(' ');
+                curlArgs = curlSep.Aggregate<string, string>(null, (current, arg) => current + arg.Insert(0, " -"));
+            }
+
+            while (true)
+            {
+                Console.WriteLine("Would you like to run the script? y/n");
+                var response = Console.ReadLine();
+                if (response == "y")
+                {
+                    break;
+                } 
+                if (response == "n")
+                    Environment.Exit(0);
+
+            }
+            return Functions.Shell(script,curlArgs);
+        }
         
     }
 }
