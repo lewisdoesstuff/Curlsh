@@ -32,7 +32,8 @@ Curl|sh aims to provide a basic overview of a shell script, providing the user w
 To execute outside of build env: 
 * `curlsh <script url>` 
 ```
-No options are currently implemented.
+-a / --args: Passes given arguments to script.
+-d / --dontrun: Don't actually run the script, just run analysis. If this isn't set, you'll still be prompted before running the script.
 ```
 
 ## Authors
@@ -42,6 +43,8 @@ No options are currently implemented.
 
 ## Version History
 
+* 0.2
+    * Added script running
 * 0.1
     * Initial Release
 
